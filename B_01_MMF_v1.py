@@ -122,8 +122,7 @@ if tickets_sold == MAX_TICKETS:
 else:
     print(f"You have sold {tickets_sold} / {MAX_TICKETS} tickets.")
 
-pay_method = string_check("Payment method: ", payment_ans, 2)
-print(f"You chose {pay_method}")
+
 
 
 

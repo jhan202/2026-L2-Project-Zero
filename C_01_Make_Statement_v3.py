@@ -25,3 +25,5 @@ def make_statement(statement, decoration, lines=1):
 make_statement("Programming is Fun!","=", 3)
 make_statement("Programming is Still Fun!","*", 2)
 make_statement("Emoji in Action", "🎶")
+
+
