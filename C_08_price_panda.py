@@ -8,10 +8,8 @@ def int_check(question):
 
     while True:
         try:
-            # Return the response if it's an integer
             response = int(input(question))
             return response
-
         except ValueError:
             print(error)
 
@@ -48,7 +46,12 @@ def string_check(question, valid_ans_list=('yes', 'no'),
         print(f"Please choose an option from {valid_ans_list}")
 
 
-# Main routine goes here
+# currency formatting function
+def currency(x):
+    return "${:,.2f}".format(x)
+
+
+# Main routine starts here
 
 # initialise variables / non-default options for string checker
 payment_ans = ('cash', 'credit')
@@ -58,44 +61,47 @@ CHILD_PRICE = 7.50
 ADULT_PRICE = 10.50
 SENIOR_PRICE = 6.50
 
-# Credit card surcharge (currently 5%)
+# Credit card surcharge (5%)
 CREDIT_SURCHARGE = 0.05
 
-# lists to hold ticket details
+# Lists to hold ticket details
 all_names = []
 all_ticket_costs = []
 all_surcharges = []
 
 mini_movie_dict = {
     'Name': all_names,
-    'Ticket price':all_ticket_costs,
+    'Ticket price': all_ticket_costs,
     'Surcharge': all_surcharges
 }
 
-# loop for testing purposes
+# Main loop
 while True:
     print()
 
-    # ask user for their name (and check it's not blank )
-    name = input("What is your name? ")
+    name = not_blank("Name (or 'xxx' to quit): ")
 
-    age = int_check("How old are you? ")
+    if name.lower() == "xxx":
+        break
+
+    # Ask user for their age and check it's between
+    age = int_check("Age: ")
 
     # Output error message / success message
-    if age <12:
+    if age < 12:
         print(f"{name} is too young")
         continue
 
     # Child ticket price is $7.50
-    elif 12 <= age < 16:
+    elif age < 16:
         ticket_price = CHILD_PRICE
 
-    # Adult ticket price is $10.50
-    elif 16 <= age < 65:
+    # Adult ticket ($10.50)
+    elif age < 65:
         ticket_price = ADULT_PRICE
 
-     # Adult ticket price is $10.50
-    elif 65 <= age < 121:
+    # Senior Citizen ticket price ($6.50)
+    elif age < 121:
         ticket_price = SENIOR_PRICE
 
     else:
@@ -103,7 +109,7 @@ while True:
         continue
 
     # ask user for payment method (cash / credit / ca / cr)
-    pay_method = string_check("Payment method: ", payment_ans, 2)
+    pay_method = string_check("Payment method (cash / credit): ", payment_ans, 2)
 
     if pay_method == "cash":
         surcharge = 0
@@ -112,19 +118,32 @@ while True:
     else:
         surcharge = ticket_price * CREDIT_SURCHARGE
 
-    # calculate total payable...
-    total_to_pay = ticket_price + surcharge
-
-    print(f"{name}'s ticket cost ${ticket_price:.2f}, they paid by {pay_method}"
-          f" so the surcharge is ${surcharge:.2f}\n"
-          f"The total payable is ${total_to_pay:.2f}\n")
-
-
-
-    # ask user for payment method (cash / credit / ca /cr)
-    pay_method = string_check("Payment Method: ", payment_ans, 2)
-    print(f"{name} has bought a ticket {pay_method}")
-
+    # Store ticket data
     all_names.append(name)
     all_ticket_costs.append(ticket_price)
+    all_surcharges.append(surcharge)
 
+
+# create dataframe / table from dictionary
+mini_movie_frame = pandas.DataFrame(mini_movie_dict)
+
+# Calculate the total payable & profit for each ticket
+mini_movie_frame['Total'] = mini_movie_frame['Ticket price'] + mini_movie_frame['Surcharge']
+mini_movie_frame['Profit'] = mini_movie_frame['Ticket price'] - 5
+
+# Work out total paid and total profit
+total_paid = mini_movie_frame['Total'].sum()
+total_profit = mini_movie_frame['Profit'].sum()
+
+# Currency Formatting (uses currency function)
+add_dollars = ['Ticket price', 'Surcharge', 'Total', 'Profit']
+for var_item in add_dollars:
+    mini_movie_frame[var_item] = mini_movie_frame[var_item].apply(currency)
+
+# Output movie frame without index
+
+print(mini_movie_frame.to_string(index=False))
+
+print()
+print(f"Total paid: ${total_paid:.2f}")
+print(f"Total profit: ${total_profit:.2f}")
