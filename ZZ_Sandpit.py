@@ -13,3 +13,4 @@ text_length = len(example_text)
 
 print(f"'{example_text}' is {text_length} characters long")
 
+
